@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"lib": ["es6", "dom"],
+		"strict": true,
+		"moduleResolution": "bundler",
+		"ignoreDeprecations": "5.0"
+	},
+	"include": ["src/**/*"]
+}
