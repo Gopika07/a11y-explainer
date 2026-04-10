@@ -25,7 +25,8 @@ figma.ui.onmessage = async (msg) => {
 
 interface RawIssue {
   layerName: string;
-  type: "contrast" | "alt-text" | "touch-target" | "font-size";
+  type: "contrast" | "alt-text" | "touch-target" | "font-size" | "all-caps" | "line-length" | "low-opacity";
+
   details: string;
   severity: "critical" | "warning";
 }
@@ -62,6 +63,36 @@ function scanNode(node: SceneNode, issues: RawIssue[]) {
         }
       }
     }
+  }
+
+  // All-caps check
+  if (node.type === "TEXT" && node.textCase === "UPPER") {
+    issues.push({
+      layerName: node.name,
+      type: "all-caps",
+      details: `Text is set to ALL CAPS using textCase property.`,
+      severity: "warning",
+    });
+  }
+
+  // Line length check
+  if (typeof node.width === "number" && node.width > 680) {
+    issues.push({
+      layerName: node.name,
+      type: "line-length",
+      details: `Text block is ${Math.round(node.width)}px wide. Long lines reduce readability.`,
+      severity: "warning",
+    });
+  }
+
+  // Low opacity text check
+  if ("opacity" in node && typeof node.opacity === "number" && node.opacity < 0.5) {
+    issues.push({
+      layerName: node.name,
+      type: "low-opacity",
+      details: `Text opacity is ${Math.round(node.opacity * 100)}%. Low opacity text often fails contrast requirements.`,
+      severity: "critical",
+    });
   }
 
   // Check images for alt text (via plugin data or name convention)
